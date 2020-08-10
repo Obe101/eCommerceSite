@@ -26,6 +26,7 @@ namespace eCommerceSite.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Products");
+
         }
     }
 }
