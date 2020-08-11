@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using eCommerceSite.Data;
 using eCommerceSite.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace eCommerceSite.Controllers
 {
@@ -17,12 +19,12 @@ namespace eCommerceSite.Controllers
         /// Display a view that lists all products
         /// </summary>
         /// <returns></returns>
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             //get all products from database
-            List<Product> products = (
-                from p in _context.Products
-                select p).ToList();
+            List<Product> products = 
+                await (from p in _context.Products
+                select p).ToListAsync();
 
             //send list of products to view to be displayed
             return View(products);
@@ -33,13 +35,13 @@ namespace eCommerceSite.Controllers
         return View();
     }
     [HttpPost]
-    public IActionResult Add(Product p)
+    public async Task<IActionResult> Add(Product p)
     {
         if(ModelState.IsValid)
         {
                 // Add to DB
                 _context.Products.Add(p);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 //Add success message
                 TempData["Message"] = $"{p.Title} was added successfully"; 
