@@ -73,7 +73,7 @@ namespace eCommerceSite.Controllers
                 _context.Entry(p).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
 
-                ViewData["Message"] = "Product updated successfully"
+                ViewData["Message"] = "Product updated successfully";
 
             }
             return View(p);
