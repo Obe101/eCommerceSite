@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using eCommerceSite.Data;
@@ -25,6 +26,13 @@ namespace eCommerceSite.Controllers
             //null colesescent operator
             int pageNum = id ?? 1;
             const int PageSize = 3;
+            ViewData["CurrentPage"] = pageNum;
+            int numProducts =
+                await (from p in _context.Products
+                 select p).CountAsync();
+            int totalPages = (int)Math.Ceiling((double)numProducts / PageSize);
+
+            ViewData["MaxPage"] = totalPages;
             //get all products from database
             List<Product> products =
                 await (from p in _context.Products
