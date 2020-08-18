@@ -31,6 +31,11 @@ namespace eCommerceSite.Models
         [Required]
         [Display(Name = "Confirm Email")]
         public string ConfirmEmail { get; set; }
+        
+        [Required]
+        [StringLength(20)]
+        public string UserName { get; set; }
+       
         [Required]
         [DataType(DataType.Password)]
         [StringLength(120, MinimumLength = 6, ErrorMessage = "Password must be between {2} and {1} characters ")]
@@ -41,6 +46,7 @@ namespace eCommerceSite.Models
         [Compare(nameof(Email))]
         [Display(Name ="Confirm Password")]
         public string ConfirmPassword { get; set; }
+        
         [DataType(DataType.Date)] // Time is ignored
         public DateTime? DateOfBirth { get; set; }
     }
