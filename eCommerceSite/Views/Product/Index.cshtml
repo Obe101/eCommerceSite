@@ -4,6 +4,7 @@
     ViewData["Title"] = "Product Catalog";
 }
 
+
 <h1>Product Catalog</h1>
 
 @if(TempData["Message"] != null)
@@ -28,7 +29,7 @@
                 <th></th>
             </tr>
         </thead>
-        <tbody>
+        <tbody >
             @foreach (Product p in Model) 
             {
                 <tr>
