@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using eCommerceSite.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -37,6 +38,10 @@ namespace eCommerceSite
                 options.Cookie.IsEssential = true;
             });
 
+            services.AddHttpContextAccessor();
+
+            //Same as above
+           // services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
         //Alternative format for code above
         //
