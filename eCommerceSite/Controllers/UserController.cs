@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using eCommerceSite.Data;
 using eCommerceSite.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace eCommerceSite.Controllers
 {
@@ -36,8 +38,53 @@ namespace eCommerceSite.Controllers
                 // add to database
                 _context.UserAccounts.Add(acc);
                 await _context.SaveChangesAsync();
+
                 //redirect to home page
+                return RedirectToAction("Index", "Home");
             }
+            return View(reg);
+        }
+        public IActionResult Login()
+        {
+            // check if user already logged in
+            if (HttpContext.Session.GetInt32("UserId").HasValue)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            UserAccount account = 
+                              await (from u in _context.UserAccounts
+                                   where (u.Username == model.UsernameOrEmail ||
+                                        u.Email == model.UsernameOrEmail) &&
+                                        u.Password == model.Password
+                                   select u).SingleOrDefaultAsync();
+            //Method syntax 
+            //UserAccount account = 
+            //        _context.UserAccounts
+            //                .Where(userAcc => userAcc.UserName == model.UsernameOrEmail ||
+            //                                   userAcc.email == model.UsernameOrEmail) &&
+            //                                   UserAcc.Password == model.Password
+            //                                   ).SingleOrDefaultAsync();
+            if(account == null)
+            {
+                // Credentials did not match
+
+                // Custom error message
+                ModelState.AddModelError(string.Empty, "Credentials were not found");
+                return View(model);
+            }
+            //log user into website
+            HttpContext.Session.SetInt32("UserId", account.UserId);
+
             return RedirectToAction("Index", "Home");
         }
     }

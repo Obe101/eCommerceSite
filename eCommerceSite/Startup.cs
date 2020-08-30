@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using eCommerceSite.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -29,6 +30,18 @@ namespace eCommerceSite
             services.AddControllersWithViews();
 
             services.AddDbContext<ProductContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDistributedMemoryCache();
+
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.IsEssential = true;
+            });
+
+            services.AddHttpContextAccessor();
+
+            //Same as above
+           // services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
         //Alternative format for code above
         //
@@ -57,6 +70,9 @@ namespace eCommerceSite
             app.UseRouting();
 
             app.UseAuthorization();
+
+            // Must be between UseRouting and useEndpoint
+            app.UseSession();
 
             app.UseEndpoints(endpoints =>
             {
