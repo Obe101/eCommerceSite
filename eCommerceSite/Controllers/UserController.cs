@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using eCommerceSite.Data;
 using eCommerceSite.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace eCommerceSite.Controllers
 {
@@ -36,9 +37,33 @@ namespace eCommerceSite.Controllers
                 // add to database
                 _context.UserAccounts.Add(acc);
                 await _context.SaveChangesAsync();
+
                 //redirect to home page
+                return RedirectToAction("Index", "Home");
             }
-            return RedirectToAction("Index", "Home");
+            return View(reg);
+        }
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
+            UserAccount account = 
+                              await (from u in _context.UserAccounts
+                                   where (u.Username == model.UsernameOrEmail ||
+                                        u.Email == model.UsernameOrEmail) &&
+                                        u.Password == model.Password
+                                   select u).SingleOrDefaultAsync();
+            if(account == null)
+            {
+                // Credentials did not match
+                return View(model);
+            }
+            //log user into website
+            return RedirectToAction("Index", "Home")
         }
     }
 }
