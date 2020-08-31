@@ -30,11 +30,11 @@ namespace eCommerceSite.Controllers
                 bool isEmailTaken = await (from account in _context.UserAccounts
                                      where account.Email == reg.Email
                                      select account).AnyAsync();
+                
                 //if so, add custom error and send back to view
                 if (isEmailTaken)
                 {
                     ModelState.AddModelError(nameof(RegisterViewModel.Email), "That email is already in use");
-                    return View(reg);
                 }
 
                 bool isUsernameTaken = await (from account in _context.UserAccounts
@@ -43,7 +43,6 @@ namespace eCommerceSite.Controllers
                 if (isUsernameTaken)
                 {
                     ModelState.AddModelError(nameof(RegisterViewModel.UserName), "That username is already in use");
-                    return View(reg);
                 }
                 if (isEmailTaken || isUsernameTaken)
                 {
@@ -62,6 +61,8 @@ namespace eCommerceSite.Controllers
                 // add to database
                 _context.UserAccounts.Add(acc);
                 await _context.SaveChangesAsync();
+
+                LogUserIn(acc.UserId);
 
                 //redirect to home page
                 return RedirectToAction("Index", "Home");
@@ -85,12 +86,12 @@ namespace eCommerceSite.Controllers
             {
                 return View(model);
             }
-            UserAccount account = 
+            UserAccount account =
                               await (from u in _context.UserAccounts
-                                   where (u.Username == model.UsernameOrEmail ||
-                                        u.Email == model.UsernameOrEmail) &&
-                                        u.Password == model.Password
-                                   select u).SingleOrDefaultAsync();
+                                     where (u.Username == model.UsernameOrEmail ||
+                                          u.Email == model.UsernameOrEmail) &&
+                                          u.Password == model.Password
+                                     select u).SingleOrDefaultAsync();
             //Method syntax 
             //UserAccount account = 
             //        _context.UserAccounts
@@ -98,7 +99,7 @@ namespace eCommerceSite.Controllers
             //                                   userAcc.email == model.UsernameOrEmail) &&
             //                                   UserAcc.Password == model.Password
             //                                   ).SingleOrDefaultAsync();
-            if(account == null)
+            if (account == null)
             {
                 // Credentials did not match
 
@@ -106,10 +107,15 @@ namespace eCommerceSite.Controllers
                 ModelState.AddModelError(string.Empty, "Credentials were not found");
                 return View(model);
             }
-            //log user into website
-            HttpContext.Session.SetInt32("UserId", account.UserId);
+            LogUserIn(account.UserId);
 
             return RedirectToAction("Index", "Home");
+        }
+
+        private void LogUserIn(int accountId)
+        {
+            //log user into website
+            HttpContext.Session.SetInt32("UserId", accountId);
         }
 
         public IActionResult Logout()
